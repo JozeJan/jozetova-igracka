@@ -1,20 +1,18 @@
 import asyncio
 import time
-
+import json
 from discord import FFmpegPCMAudio, app_commands
 from openai import OpenAI
 import discord
 from discord.ext import commands
-from typing import List
-global dict                          ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
+from typing import List                         ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
 dict = {}
 import os
 
-global glasovi
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
-global customlist
 customlist = {}
-
+leaderboard = {}
+timeboard = {}
 # Define the bot's intents
 intents = discord.Intents.all()
 
@@ -27,6 +25,9 @@ async def on_ready():
     print(f' {client.user} (ID: {client.user.id})')
     print("work bitch garblt")
     print('------')
+    global leaderboard
+    with open('leaderboard.txt', 'r') as file:
+        leaderboard = json.load(file)  # Load leaderboard as a dictionary
 
 @client.command()
 async def ponovi(ctx):
@@ -92,26 +93,23 @@ async def tts(message_content, message_author): #dict author is needed to find i
             response.stream_to_file("speech.mp3")
 
 
-global leaderboard, timeboard
-leaderboard = {}
-timeboard = {}
+
 @client.event
 async def on_voice_state_update(member, prev, cur):
-    global start_time
-
     user = member.name
     if cur.self_mute and not prev.self_mute: # Mutes
-        print(f"{user} stopped talking!")
         timeboard[user] = time.time()
     if prev.self_mute and not cur.self_mute: # Unmutes
-        print(f"{user} started talking!")
-        print(timeboard[user])
         end_time = time.time()
         elapsed_time = end_time - timeboard[user]
         rounded_time = round(elapsed_time, 2)
         channel_id = 1235858508059119649  # Replace this with your actual channel ID
         channel = client.get_channel(channel_id)
-        await channel.send(f"Hello, črnc {user} je bil mutan {rounded_time} sekund!")
-        # if rounded_time > leaderboard:
-        #     leaderboard[user] = rounded_time
+        if user not in leaderboard or rounded_time > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
+            leaderboard[user] = rounded_time
+            await channel.send(f"New record from {member.mention}: {leaderboard}")
+            with open("leaderboard.txt", "w") as file:
+                json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
+
+
 client.run('MTIzNTE0MTA2ODExNTQxNTA0MA.G3NQff.opEc4DgTeQKbv6viIFZS_O-eh7rtgP5X4rccMM')
