@@ -29,6 +29,7 @@ async def on_ready():
     with open('leaderboard.txt', 'r') as file:
         leaderboard = json.load(file)  # Load leaderboard as a dictionary
 
+
 @client.command()
 async def ponovi(ctx):
     messageaudio = FFmpegPCMAudio("/home/joze/PycharmProjects/JožetovaIgračkaV4/speech.mp3")
@@ -102,12 +103,13 @@ async def on_voice_state_update(member, prev, cur):
     if prev.self_mute and not cur.self_mute: # Unmutes
         end_time = time.time()
         elapsed_time = end_time - timeboard[user]
-        rounded_time = round(elapsed_time, 2)
+        elepsed_time_hour = elapsed_time / 60
+        rounded_time_hour = round(elepsed_time_hour, 2)
         channel_id = 1235858508059119649  # Replace this with your actual channel ID
         channel = client.get_channel(channel_id)
-        if user not in leaderboard or rounded_time > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
-            leaderboard[user] = rounded_time
-            await channel.send(f"New record from {member.mention}: {leaderboard}")
+        if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
+            leaderboard[user] = rounded_time_hour
+            await channel.send(f"""New record from {member.mention}: {rounded_time_hour} minut. {leaderboard}""")
             with open("leaderboard.txt", "w") as file:
                 json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
 
