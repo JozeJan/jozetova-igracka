@@ -5,6 +5,7 @@ from discord import FFmpegPCMAudio, app_commands
 from openai import OpenAI
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 from typing import List                         ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
 dict = {}
 import os
@@ -12,7 +13,7 @@ import os
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 customlist = {}
 leaderboard = {}
-timeboard = {}
+timemute = {}
 # Define the bot's intents
 intents = discord.Intents.all()
 
@@ -28,6 +29,16 @@ async def on_ready():
     global leaderboard
     with open('leaderboard.txt', 'r') as file:
         leaderboard = json.load(file)  # Load leaderboard as a dictionary
+
+
+
+    # @tasks.loop()
+    # async def banana():
+    #     print("banana")
+    #     print("banana")
+    #     banana.cancel()
+    #
+    # banana.start()
 
 
 @client.command()
@@ -93,16 +104,33 @@ async def tts(message_content, message_author): #dict author is needed to find i
         ) as response:
             response.stream_to_file("speech.mp3")
 
+@tasks.loop()
+async def anticheat(member):
+    if member.voice:
+        pass
+    else:
+        timemute[member.name] = None
+        print(f"reseted the {member} time becouse he left")
+        anticheat.stop()
+
+
 
 
 @client.event
 async def on_voice_state_update(member, prev, cur):
     user = member.name
     if cur.self_mute and not prev.self_mute: # Mutes
-        timeboard[user] = time.time()
+        timemute[user] = time.time()
+        print(f"{user} muted")
+        anticheat.start(member)
+
+
+
+
     if prev.self_mute and not cur.self_mute: # Unmutes
+        print(f"{user} unmuted")
         end_time = time.time()
-        elapsed_time = end_time - timeboard[user]
+        elapsed_time = end_time - timemute[user]
         elepsed_time_hour = elapsed_time / 60
         rounded_time_hour = round(elepsed_time_hour, 2)
         channel_id = 1235858508059119649  # Replace this with your actual channel ID
