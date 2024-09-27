@@ -1,1 +1,1 @@
-{"joze3.0": 1.21, "oskar.abcd": 5.29, "kristybisti": 1.72}
+{"joze3.0": 107.18, "oskar.abcd": 450.72, "kristybisti": 321.89, "privatech": 116.4, "juhus": 292.78, "kyrafn1x": 3.38, "fokusforce": 0.04}
