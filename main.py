@@ -4,9 +4,7 @@ import json
 from discord import FFmpegPCMAudio, app_commands
 from openai import OpenAI
 import discord
-from discord.ext import commands
-from discord.ext import tasks
-from typing import List                         ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE! NIGGER
+from discord.ext import commands                    ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
 dict = {}
 import os
 
