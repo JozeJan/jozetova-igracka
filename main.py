@@ -6,7 +6,7 @@ from openai import OpenAI
 import discord
 from discord.ext import commands
 from discord.ext import tasks
-from typing import List                         ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
+from typing import List                         ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE! NIGGER
 dict = {}
 import os
 
