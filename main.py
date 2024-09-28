@@ -2,7 +2,6 @@ import asyncio
 import time
 import json
 from discord import FFmpegPCMAudio, app_commands
-from dulwich.contrib.test_swift import skipmsg
 from openai import OpenAI
 import discord
 from discord.ext import commands
@@ -16,10 +15,26 @@ customlist = {}
 leaderboard = {}
 playtime = {}
 timemute = {}
-# Define the bot's intents
+global lisenforjoin, lisennextmessig, messiges
+lisennextmessig = []
+lisenforjoin = {}
+messiges = {}
+global emojiseznam
+emojiseznam = [
+        "🥇 1st",
+        "🥈 2nd",
+        "🥉 3rd",
+        "🚀 4th",
+        "😎 5th",
+        "😬 6th",
+        "😟 7th",
+        "🤢 8th",
+        "💩 9th",
+        "🗑️ 10th"
+    ]
+
+
 intents = discord.Intents.all()
-
-
 from keys import openai_api, discordapi_key
 
 
@@ -32,26 +47,16 @@ async def on_ready():
     print(f' {client.user} (ID: {client.user.id})')
     print("work bitch garblt")
     print('------')
-    global leaderboard
+    global leaderboard, playtime
     with open('leaderboard.txt', 'r') as file:
         leaderboard = json.load(file)  # Load leaderboard as a dictionary
     with open('playtime.txt', 'r') as file:
-        leaderboard = json.load(file)  # Load leaderboard as a dictionary
-
-
-
-    # @tasks.loop()
-    # async def banana():
-    #     print("banana")
-    #     print("banana")
-    #     banana.cancel()
-    #
-    # banana.start()
+        playtime = json.load(file)  # Load leaderboard as a dictionary
 
 
 @client.command()
 async def ponovi(ctx):
-    messageaudio = FFmpegPCMAudio("/home/joze/PycharmProjects/JožetovaIgračkaV4/speech.mp3")
+    messageaudio = FFmpegPCMAudio("speech.mp3")
     ctx.voice_client.play(messageaudio)
 
 @client.command()
@@ -74,19 +79,14 @@ async def govori(ctx, pglas):
             await ctx.send(f"Connected to voice channel: '{voice_channel}'")
     else:
         await ctx.send(f"Uporabite eden izmed teh glasov: {glasovi}")
-#
-# @client.command()
-# async def utihni(ctx):
-#     global author
-#     author = []
-#     await voice_channel.disconnect() makes leave
+
 
 @client.event #reading massages no matter what
 async def on_message(message):
     await client.process_commands(message)
     message_content = message.content
     message_author = message.author
-    message_words = set(message_content.split()) #splits the words (for detecting custom uwu)
+    message_words = set(message_content.split()) #splits the words (for detecting custom uwu) leave it for now
 
     donotread = ["!govori", "!ponovi"]
     if message_author in dict and not any(word in message_content for word in donotread): #al naredi voice file in predvaja al ne
@@ -96,11 +96,17 @@ async def on_message(message):
         custom = set(customlist).intersection(message_words)
         print(f'Cooking a new massage for -> {message_author} Rekel je: {message_content}')
         await tts(message_content, message_author)
-        messageaudio = FFmpegPCMAudio("/home/joze/PycharmProjects/JožetovaIgračkaV4/speech.mp3")
+        messageaudio = FFmpegPCMAudio("speech.mp3")
 
         globalctx.voice_client.play(messageaudio)
+    if message_author in lisennextmessig:
+        print("cuming!!!")
+        messiges[message_author] = message_content
+        print(messiges)
     else:
         print(f'Random New message -> {message_author} said: {message_content}')
+
+
 
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
@@ -112,66 +118,83 @@ async def tts(message_content, message_author): #dict author is needed to find i
         ) as response:
             response.stream_to_file("speech.mp3")
 
-@tasks.loop()
-async def anticheat(member):
-    if member.voice:
-        pass
-    else:
-        timemute[member.name] = None
-        print(f"reseted the {member} time becouse he left")
-        anticheat.stop()
+# @tasks.loop()
+# async def anticheat(member):
+#     if member.voice: POMOJE NA RABM VEČ
+#         pass
+#     else:
+#         timemute[member.name] = None
+#         anticheat.stop()
 
 @client.command()
-async def displayleaderboard(ctx):
+async def leaderboard(ctx):
     i = 0
-    seznam = [
-        "🥇 1st",
-        "🥈 2nd",
-        "🥉 3rd",
-        "🚀 4th",
-        "😎 5th",
-        "😬 6th",
-        "😟 7th",
-        "🤢 8th",
-        "💩 9th",
-        "🗑️ 10th"
-    ]
     messig = []
     for tekmovalec in sorted(leaderboard.items(),key=lambda item:-item[1]):
         if i > 10:
             break
-        messig.append(f"{seznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
+        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
         i+=1
+    await ctx.send("\n".join(messig))
+@client.command()
+async def playtime(ctx):
+    i = 0
+    messig = []
+    for tekmovalec in sorted(playtime.items(), key=lambda item: -item[1]):
+        if i > 10:
+            break
+        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
+        i += 1
     await ctx.send("\n".join(messig))
 
 
 @client.event
-async def on_voice_state_update(member, prev, cur):
+async def on_voice_state_update(member, before, after):
+    channel_id = 1235858508059119649  # Replace this with your actual channel ID
+    channel = client.get_channel(channel_id)
+    print(member)
     user = member.name
-    if cur.self_mute and not prev.self_mute: # Mutes
+    if after.self_mute and not before.self_mute: # Mutes
         timemute[user] = time.time()
         print(f"{user} muted")
-        anticheat.start(member)
-
-
-
-    if prev.self_mute and not cur.self_mute: # Unmutes
-        anticheat.stop() #stops so it doesnt erorred
+        # anticheat.start(member)
+    if before.channel is not None and after.channel is None:
+        timemute[member.name] = None
+    if before.self_mute and not after.self_mute: # Unmutes
+        # anticheat.stop() #stops so it doesnt erorred
         end_time = time.time()
-        elapsed_time = end_time - timemute[user]
-        elepsed_time_hour = elapsed_time / 60
-        rounded_time_hour = round(elepsed_time_hour, 2)
-        channel_id = 1235858508059119649  # Replace this with your actual channel ID
-        channel = client.get_channel(channel_id)
-        if user not in playtime:
-            playtime[user] = 0  # Initialize to 0 if it doesn't exist
-        playtime[user] += rounded_time_hour
-        if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
-            leaderboard[user] = rounded_time_hour
-            await channel.send(f"""New record from {member.mention}: {rounded_time_hour} minut. Your total muted time is {playtime[user]}""")
-            with open("leaderboard.txt", "w") as file:
+        if timemute[user]:
+            elapsed_time = end_time - timemute[user]
+            elepsed_time_hour = elapsed_time / 60
+            rounded_time_hour = round(elepsed_time_hour, 2)
+            if user not in playtime:
+                playtime[user] = 0  # Initialize to 0 if it doesn't exist
+            playtime[user] += rounded_time_hour
+            with open("playtime.txt", "w") as file:
                 json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
-        print(f"{member.name} unmuted was muted for {rounded_time_hour}")
+            if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
+                leaderboard[user] = rounded_time_hour
+                await channel.send(f"""New record from {member.mention}: {rounded_time_hour} minut. Your total muted time is {playtime[user]}""")
+                with open("leaderboard.txt", "w") as file:
+                    json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
+            print(f"{member.name} unmuted was muted for {rounded_time_hour}")
+        else:
+            await channel.send(f"HAHAHAH PA SEM TE DOBU {member.mention} BADNA! NČ GULJUFANJA PR BAJTA")
+
+    # if member.voice and user in lisenforjoin:
+    #     tts()
+
+
+
+
+
+@client.command()
+async def leavemesig(ctx, ime):
+    if ime:
+        await ctx.send(f"Prepering a new message for {ime} please type it.")
+        lisennextmessig.insert(0,ctx.author.name)
+        lisenforjoin[ime] = ctx.author
+        print(f"adeed to {lisennextmessig}")
 
 
 
