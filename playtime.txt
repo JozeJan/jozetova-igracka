@@ -1,0 +1,1 @@
+{"privatech": 2.76, "joze3.0": 81.68, "oskar.abcd": 18.23, "kristybisti": 2.64, "juhus": 1.29, "gmartinek": 3.21, "monki_38": 0.37}

@@ -3,10 +3,10 @@ import random
 import time
 import json
 from discord import FFmpegPCMAudio
+from dotenv import dotenv_values
 from openai import OpenAI
 import discord
 from discord.ext import commands                    ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
-from tomlkit import value
 
 dict = {}
 import os
@@ -36,7 +36,8 @@ emojiseznam = [
 
 
 intents = discord.Intents.all()
-from keys import openai_api, discordapi_key
+global keys
+keys = dotenv_values(".env")
 
 
 # Create the bot instance with the specified command prefix and intents
@@ -112,7 +113,7 @@ async def on_message(message):
         print(f'{message_author} said: {message_content}')
 
 async def speak(text, voice):  # dict author is needed to find in dict the voice theyuse
-    client = OpenAI(api_key=openai_api)
+    client = OpenAI(api_key=keys["openai_api"])
     with client.audio.speech.with_streaming_response.create(
             model="tts-1",
             voice=voice,
@@ -121,7 +122,7 @@ async def speak(text, voice):  # dict author is needed to find in dict the voice
         response.stream_to_file("speech.mp3")
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
-    client = OpenAI(api_key=openai_api)
+    client = OpenAI(api_key=keys["openai_api"])
     with client.audio.speech.with_streaming_response.create(
         model="tts-1",
         voice=dict.get(message_author),
@@ -199,13 +200,17 @@ async def on_voice_state_update(member, before, after):
             voice_channel = after.channel
             print(f"waiting out {list}")
             await speak(f"Novo sporočilo za {user}: {list}", "echo")
-            await asyncio.sleep(random.uniform(1, 100))
+            await asyncio.sleep(random.uniform(3, 5))
             print(f"reading out {list}")
             await voice_channel.connect()
             if not member.guild.voice_client:  # If the bot is not connected to any channel
                 voice_client = await voice_channel.connect()
             else:
                 voice_client = member.guild.voice_client
+            yougotmail = FFmpegPCMAudio("yougotmail.wav")
+            voice_client.play(yougotmail)
+            while voice_client.is_playing():
+                await asyncio.sleep(1)
             messageaudio = FFmpegPCMAudio("speech.mp3")
             voice_client.play(messageaudio)
             while voice_client.is_playing():
@@ -226,4 +231,4 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
-client.run(discordapi_key)
+client.run(keys["discordapi_key"])
