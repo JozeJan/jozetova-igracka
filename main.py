@@ -1,10 +1,13 @@
 import asyncio
+import random
 import time
 import json
-from discord import FFmpegPCMAudio, app_commands
+from discord import FFmpegPCMAudio
 from openai import OpenAI
 import discord
 from discord.ext import commands                    ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
+from tomlkit import value
+
 dict = {}
 import os
 
@@ -14,7 +17,7 @@ leaderboard = {}
 playtime = {}
 timemute = {}
 global lisenforjoin, lisennextmessig, messiges
-lisennextmessig = []
+lisennextmessig = {}
 lisenforjoin = {}
 messiges = {}
 global emojiseznam
@@ -54,6 +57,8 @@ async def on_ready():
 
 @client.command()
 async def ponovi(ctx):
+    voice_channel = ctx.author.voice.channel
+    await voice_channel.connect()
     messageaudio = FFmpegPCMAudio("speech.mp3")
     ctx.voice_client.play(messageaudio)
 
@@ -97,24 +102,32 @@ async def on_message(message):
         messageaudio = FFmpegPCMAudio("speech.mp3")
 
         globalctx.voice_client.play(messageaudio)
-    if message_author in lisennextmessig:
-        print("cuming!!!")
-        messiges[message_author] = message_content
-        print(messiges)
+    if message_author.name in lisennextmessig and "!leavenote" not in message_content:
+        name = lisennextmessig[message_author.name]
+        lisenforjoin[name] = [message_content]
+        print(lisenforjoin)
+        del lisennextmessig[message_author.name]
+
     else:
-        print(f'Random New message -> {message_author} said: {message_content}')
+        print(f'{message_author} said: {message_content}')
 
-
-
+async def speak(text, voice):  # dict author is needed to find in dict the voice theyuse
+    client = OpenAI(api_key=openai_api)
+    with client.audio.speech.with_streaming_response.create(
+            model="tts-1",
+            voice=voice,
+            input=text,
+    ) as response:
+        response.stream_to_file("speech.mp3")
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
-        client = OpenAI(api_key=openai_api)
-        with client.audio.speech.with_streaming_response.create(
-            model="tts-1",
-            voice=dict.get(message_author),
-            input=message_content,
-        ) as response:
-            response.stream_to_file("speech.mp3")
+    client = OpenAI(api_key=openai_api)
+    with client.audio.speech.with_streaming_response.create(
+        model="tts-1",
+        voice=dict.get(message_author),
+        input=message_content,
+    ) as response:
+        response.stream_to_file("speech.mp3")
 
 # @tasks.loop()
 # async def anticheat(member):
@@ -148,9 +161,9 @@ async def playtime(ctx):
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    #does the leaderboard biznis
     channel_id = 1235858508059119649  # Replace this with your actual channel ID
     channel = client.get_channel(channel_id)
-    print(member)
     user = member.name
     if after.self_mute and not before.self_mute: # Mutes
         timemute[user] = time.time()
@@ -169,7 +182,7 @@ async def on_voice_state_update(member, before, after):
                 playtime[user] = 0  # Initialize to 0 if it doesn't exist
             playtime[user] += rounded_time_hour
             with open("playtime.txt", "w") as file:
-                json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
+                json.dump(playtime, file)  # Dump leaderboard dictionary as JSON
             if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
                 leaderboard[user] = rounded_time_hour
                 await channel.send(f"""New record from {member.mention}: {rounded_time_hour} minut. Your total muted time is {playtime[user]}""")
@@ -178,23 +191,39 @@ async def on_voice_state_update(member, before, after):
             print(f"{member.name} unmuted was muted for {rounded_time_hour}")
         else:
             await channel.send(f"HAHAHAH PA SEM TE DOBU {member.mention} BADNA! NČ GULJUFANJA PR BAJTA")
+    #does the leavemesig
+    if after.channel is not None and before.channel is None:
+        print(f"{user} joined the channel")
+        if user in lisenforjoin:
+            list = lisenforjoin[user]
+            voice_channel = after.channel
+            print(f"waiting out {list}")
+            await speak(f"Novo sporočilo za {user}: {list}", "echo")
+            await asyncio.sleep(random.uniform(1, 100))
+            print(f"reading out {list}")
+            await voice_channel.connect()
+            if not member.guild.voice_client:  # If the bot is not connected to any channel
+                voice_client = await voice_channel.connect()
+            else:
+                voice_client = member.guild.voice_client
+            messageaudio = FFmpegPCMAudio("speech.mp3")
+            voice_client.play(messageaudio)
+            while voice_client.is_playing():
+                await asyncio.sleep(1)
+            await voice_client.disconnect()
+            del lisenforjoin[user]
 
-    # if member.voice and user in lisenforjoin:
-    #     tts()
-
-
-
+@client.command()
+async def test(ctx):
+    await ctx.send(lisennextmessig[ctx.author.name])
 
 
 @client.command()
-async def leavemesig(ctx, ime):
+async def leavenote(ctx, ime):
     if ime:
-        await ctx.send(f"Prepering a new message for {ime} please type it.")
-        lisennextmessig.insert(0,ctx.author.name)
-        lisenforjoin[ime] = ctx.author
-        print(f"adeed to {lisennextmessig}")
-
-
+        await ctx.send(f"Prepering a new message for {ime} the next message you send will be deliverd to him!")
+        lisennextmessig[ctx.author.name] = ime
+        lisenforjoin[ime] = ""
 
 
 client.run(discordapi_key)
