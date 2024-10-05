@@ -106,7 +106,7 @@ async def on_message(message):
     if message_author.name in lisennextmessig and "!leavenote" not in message_content:
         name = lisennextmessig[message_author.name]
         lisenforjoin[name] = [message_content]
-        print(lisenforjoin)
+        print(f" printing lisen for join {lisenforjoin}")
         del lisennextmessig[message_author.name]
 
     else:
@@ -143,7 +143,7 @@ async def leaderboard(ctx):
     i = 0
     messig = []
     for tekmovalec in sorted(leaderboard.items(),key=lambda item:-item[1]):
-        if i > 10:
+        if i > 9:
             break
         messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
         i+=1
@@ -153,7 +153,7 @@ async def playtime(ctx):
     i = 0
     messig = []
     for tekmovalec in sorted(playtime.items(), key=lambda item: -item[1]):
-        if i > 10:
+        if i > 9:
             break
         messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
         i += 1
