@@ -9,8 +9,10 @@ from discord import FFmpegPCMAudio
 from dotenv import dotenv_values
 from openai import OpenAI
 import discord
-from discord.ext import commands                    ####<--------------------------------------------NEVEM KVA SE KLE SPLOH DOGAJA JUST LEAVE IT ALONE!
+from discord.ext import commands
 
+from OrnkOkvara import NormalOkvara, OrnkOkvara
+global NormalOkvara, OrnkOkvara
 dict = {}
 import os
 
@@ -51,6 +53,43 @@ keys = dotenv_values(".env")
 client = commands.Bot(command_prefix='!', intents=intents)
 
 # Event listener for when the bot has finished preparing
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await errorsound(ctx)
+
+
+async def errorsound(ctx):
+    voice_channel = ctx.author.voice.channel
+    if ctx.voice_client:
+        print("allready connected")
+    else:  # If the bot is not connected
+        await voice_channel.connect()  # Connect to the voice channel
+    if random.random() < 0.2:
+        if random.random() < 0.5:
+            ctx.voice_client.play(FFmpegPCMAudio("./Errors/OrnkOkvara.mp3"))
+            while ctx.voice_client.is_playing():
+                await asyncio.sleep(1)
+            await ctx.voice_client.disconnect()
+            await ctx.send(random.choice(OrnkOkvara))
+        else:
+            ctx.voice_client.play(FFmpegPCMAudio("./Errors/OrnkOkvara2.mp3"))
+            while ctx.voice_client.is_playing():
+                await asyncio.sleep(1)
+            await ctx.voice_client.disconnect()
+            await ctx.send(random.choice(OrnkOkvara))
+    else:
+        if random.random() < 0.3:
+            ctx.voice_client.play(FFmpegPCMAudio("./Errors/NormalOkvara.mp3"))
+            await ctx.send(random.choice(NormalOkvara))
+        elif random.random() < 0.3:
+            ctx.voice_client.play(FFmpegPCMAudio("./Errors/NormalOkvara2.mp3"))
+            await ctx.send(random.choice(NormalOkvara))
+        else:
+            ctx.voice_client.play(FFmpegPCMAudio("./Errors/NormalOkvara3.mp3"))
+            await ctx.send(random.choice(NormalOkvara))
+
 
 
 def sanitize_filename(filename):
