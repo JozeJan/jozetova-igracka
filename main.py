@@ -2,6 +2,9 @@ import asyncio
 import random
 import time
 import json
+from asyncio import tasks
+import re
+
 from discord import FFmpegPCMAudio
 from dotenv import dotenv_values
 from openai import OpenAI
@@ -16,10 +19,14 @@ customlist = {}
 leaderboard = {}
 playtime = {}
 timemute = {}
-global lisenforjoin, lisennextmessig, messiges
+global lisenforjoin, lisennextmessig, messiges, userincall, timegable, randomgamblevalue
+userincall = {}
 lisennextmessig = {}
 lisenforjoin = {}
 messiges = {}
+timegable = 0
+randomgamblevalue = 0
+
 global emojiseznam
 emojiseznam = [
         "🥇 1st",
@@ -44,6 +51,15 @@ keys = dotenv_values(".env")
 client = commands.Bot(command_prefix='!', intents=intents)
 
 # Event listener for when the bot has finished preparing
+
+
+def sanitize_filename(filename):
+    """
+    Sanitize the filename by removing invalid characters for a file path.
+    """
+    # Replace characters not allowed in file names with underscores
+    return re.sub(r'[<>:"/\\|?*]', '_', filename)
+
 @client.event
 async def on_ready():
     print(f' {client.user} (ID: {client.user.id})')
@@ -90,19 +106,23 @@ async def on_message(message):
     await client.process_commands(message)
     message_content = message.content
     message_author = message.author
+    sanitized_message_content = sanitize_filename(message_content)
+    sanitized_message_author = sanitize_filename(message_author.name)
     message_words = set(message_content.split()) #splits the words (for detecting custom uwu) leave it for now
 
     donotread = ["!govori", "!ponovi"]
+    while globalctx.voice_client.is_playing():
+        await asyncio.sleep(1)  # Check every second if the bot is still playing
+        print(f"Fixing overlap from {message_author}")
     if message_author in dict and not any(word in message_content for word in donotread): #al naredi voice file in predvaja al ne
-        print(message_words)  # delite just for fun
-        global custom
-
-        custom = set(customlist).intersection(message_words)
-        print(f'Cooking a new massage for -> {message_author} Rekel je: {message_content}')
-        await tts(message_content, message_author)
-        messageaudio = FFmpegPCMAudio("speech.mp3")
-
-        globalctx.voice_client.play(messageaudio)
+        if not globalctx.voice_client.is_playing():
+            print(message_words)  # delite just for fun
+            global custom
+            custom = set(customlist).intersection(message_words)
+            print(f'Cooking a new massage for -> {message_author} Rekel je: {message_content}')
+            await tts(message_content, message_author)
+            messageaudio = FFmpegPCMAudio(f"./TTSR/{sanitized_message_content}:{sanitized_message_author}.mp3")
+            globalctx.voice_client.play(messageaudio)
     if message_author.name in lisennextmessig and "!leavenote" not in message_content:
         name = lisennextmessig[message_author.name]
         lisenforjoin[name] = [message_content]
@@ -119,7 +139,7 @@ async def speak(text, voice):  # dict author is needed to find in dict the voice
             voice=voice,
             input=text,
     ) as response:
-        response.stream_to_file("speech.mp3")
+        response.stream_to_file(f"{text}:{voice}.mp3")
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
     client = OpenAI(api_key=keys["openai_api"])
@@ -128,15 +148,18 @@ async def tts(message_content, message_author): #dict author is needed to find i
         voice=dict.get(message_author),
         input=message_content,
     ) as response:
-        response.stream_to_file("speech.mp3")
+        sanitized_message_content = sanitize_filename(message_content)
+        sanitized_message_author = sanitize_filename(message_author.name)
+        tts_filepath = f"./TTSR/{sanitized_message_content}:{sanitized_message_author}.mp3"
+        response.stream_to_file(tts_filepath)
 
-# @tasks.loop()
-# async def anticheat(member):
-#     if member.voice: POMOJE NA RABM VEČ
-#         pass
-#     else:
-#         timemute[member.name] = None
-#         anticheat.stop()
+# @tasks.loop(seconds=60)
+# async def timegamble():
+#     timegable += 1
+#     if randomgamblevalue is None:
+#         randomgamblevalue = random.randint(900, 1440)
+#     if timegamble == randomgamblevalue:
+#         timegamble.stop()
 
 @client.command()
 async def leaderboard(ctx):
@@ -145,7 +168,7 @@ async def leaderboard(ctx):
     for tekmovalec in sorted(leaderboard.items(),key=lambda item:-item[1]):
         if i > 9:
             break
-        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
+        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {round(tekmovalec[1], 2)}")
         i+=1
     await ctx.send("\n".join(messig))
 @client.command()
@@ -155,7 +178,7 @@ async def playtime(ctx):
     for tekmovalec in sorted(playtime.items(), key=lambda item: -item[1]):
         if i > 9:
             break
-        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {tekmovalec[1]}")
+        messig.append(f"{emojiseznam[i]}: {tekmovalec[0]}, Minute: {round(tekmovalec[1], 2)}")
         i += 1
     await ctx.send("\n".join(messig))
 
@@ -172,6 +195,8 @@ async def on_voice_state_update(member, before, after):
         # anticheat.start(member)
     if before.channel is not None and after.channel is None:
         timemute[member.name] = None
+        del userincall[user]
+        print(f"{userincall} left")
     if before.self_mute and not after.self_mute: # Unmutes
         # anticheat.stop() #stops so it doesnt erorred
         end_time = time.time()
@@ -182,6 +207,7 @@ async def on_voice_state_update(member, before, after):
             if user not in playtime:
                 playtime[user] = 0  # Initialize to 0 if it doesn't exist
             playtime[user] += rounded_time_hour
+            print(f"zaokrožil na {playtime[user]}")
             with open("playtime.txt", "w") as file:
                 json.dump(playtime, file)  # Dump leaderboard dictionary as JSON
             if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
@@ -193,6 +219,12 @@ async def on_voice_state_update(member, before, after):
         else:
             await channel.send(f"HAHAHAH PA SEM TE DOBU {member.mention} BADNA! NČ GULJUFANJA PR BAJTA")
     #does the leavemesig
+
+
+
+    if after.channel is not None and before.channel is None:
+        userincall[user] = after.channel.name
+        print(f"{userincall} joined")
     if after.channel is not None and before.channel is None:
         print(f"{user} joined the channel")
         if user in lisenforjoin:
@@ -217,6 +249,15 @@ async def on_voice_state_update(member, before, after):
                 await asyncio.sleep(1)
             await voice_client.disconnect()
             del lisenforjoin[user]
+    if  before.channel != after.channel:
+        userincall[user] = after.channel.name
+        print(f"{userincall} swiched")
+
+
+
+
+
+
 
 @client.command()
 async def test(ctx):
