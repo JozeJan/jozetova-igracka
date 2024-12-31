@@ -90,7 +90,42 @@ async def errorsound(ctx):
             ctx.voice_client.play(FFmpegPCMAudio("./Errors/NormalOkvara3.mp3"))
             await ctx.send(random.choice(NormalOkvara))
 
-
+#oneliner V trust
+async def randommedic(ctx): #oneliner trust
+    voice_channel = ctx.author.voice.channel
+    if ctx.voice_client:
+        print("allready connected")
+    else:  # If the bot is not connected
+        await voice_channel.connect()  # Connect to the voice channel
+    folders = [name for name in os.listdir("./medic") if os.path.isdir(os.path.join("./medic", name))]  # THNAKS CHAD GBT NO IDEA WHAT THIS CODE DOES
+    random_folder = random.choice(folders)
+    randomchosingfilefolder = f"./medic/{random_folder}"
+    gambledmedicvoses = os.listdir(randomchosingfilefolder)
+    randomgambledvoice = random.choice(gambledmedicvoses)
+    finalgambledvoice = f"./medic/{random_folder}/{randomgambledvoice}"
+    if os.path.isfile(finalgambledvoice):
+        print(f"{finalgambledvoice} is a file.")
+        ctx.voice_client.play(FFmpegPCMAudio(finalgambledvoice))
+    # Check if it's a folder
+    else:
+        print(f"{finalgambledvoice} is a folder.")
+        folders2 = [name for name in os.listdir(f"./medic/{finalgambledvoice}") if os.path.isdir(os.path.join(f"./medic/{finalgambledvoice}", name))]  # THNAKS CHAD GBT NO IDEA WHAT THIS CODE DOES
+        randomgambledvoice2 = random.choice(folders2)
+        finalgambledvoice2 = f"./medic/{random_folder}/{randomgambledvoice}/{randomgambledvoice2}"
+        if os.path.isfile(finalgambledvoice):
+            print(f"{finalgambledvoice} is a file.")
+            ctx.voice_client.play(FFmpegPCMAudio(finalgambledvoice2))
+        # Check if it's a folder
+        else:
+            print(f"{finalgambledvoice} is a folder.")
+            folders3 = [name for name in os.listdir(f"./medic/{finalgambledvoice}/{finalgambledvoice2}") if os.path.isdir(os.path.join(f"./medic/{finalgambledvoice}/{finalgambledvoice2}", name))]  # THNAKS CHAD GBT NO IDEA WHAT THIS CODE DOES
+            randomgambledvoice3 = random.choice(folders3)
+            finalgambledvoice3 = f"./medic/{random_folder}/{randomgambledvoice}/{randomgambledvoice2}/{randomgambledvoice3}"
+            ctx.voice_client.play(FFmpegPCMAudio(finalgambledvoice3))
+            if os.path.isfile(finalgambledvoice):
+                ctx.voice_client.play(FFmpegPCMAudio(finalgambledvoice3))
+            else:
+                print("wtf?") #oneliner
 
 def sanitize_filename(filename):
     """
@@ -110,13 +145,11 @@ async def on_ready():
     with open('playtime.txt', 'r') as file:
         playtime = json.load(file)  # Load leaderboard as a dictionary
 
-
+#
 @client.command()
-async def ponovi(ctx):
-    voice_channel = ctx.author.voice.channel
-    await voice_channel.connect()
-    messageaudio = FFmpegPCMAudio("speech.mp3")
-    ctx.voice_client.play(messageaudio)
+async def medic(ctx):
+    await randommedic(ctx)
+
 
 @client.command()
 async def govori(ctx, pglas):
@@ -150,9 +183,9 @@ async def on_message(message):
     message_words = set(message_content.split()) #splits the words (for detecting custom uwu) leave it for now
 
     donotread = ["!govori", "!ponovi"]
-    while globalctx.voice_client.is_playing():
-        await asyncio.sleep(1)  # Check every second if the bot is still playing
-        print(f"Fixing overlap from {message_author}")
+    # while globalctx.voice_client.is_playing():
+    #     await asyncio.sleep(1)  # Check every second if the bot is still playing
+    #     print(f"Fixing overlap from {message_author}")
     if message_author in dict and not any(word in message_content for word in donotread): #al naredi voice file in predvaja al ne
         if not globalctx.voice_client.is_playing():
             print(message_words)  # delite just for fun
@@ -246,6 +279,7 @@ async def on_voice_state_update(member, before, after):
             if user not in playtime:
                 playtime[user] = 0  # Initialize to 0 if it doesn't exist
             playtime[user] += rounded_time_hour
+            playtime[user] = round(playtime[user], 2)
             print(f"zaokrožil na {playtime[user]}")
             with open("playtime.txt", "w") as file:
                 json.dump(playtime, file)  # Dump leaderboard dictionary as JSON
@@ -293,14 +327,6 @@ async def on_voice_state_update(member, before, after):
         print(f"{userincall} swiched")
 
 
-
-
-
-
-
-@client.command()
-async def test(ctx):
-    await ctx.send(lisennextmessig[ctx.author.name])
 
 
 @client.command()
