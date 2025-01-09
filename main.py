@@ -45,8 +45,6 @@ emojiseznam = [
 
 
 intents = discord.Intents.all()
-global keys
-keys = dotenv_values(".env")
 
 
 # Create the bot instance with the specified command prefix and intents
@@ -140,9 +138,9 @@ async def on_ready():
     print("work bitch garblt")
     print('------')
     global leaderboard, playtime
-    with open('leaderboard.txt', 'r') as file:
+    with open('/data/leaderboard.txt', 'r+') as file:
         leaderboard = json.load(file)  # Load leaderboard as a dictionary
-    with open('playtime.txt', 'r') as file:
+    with open('/data/playtime.txt', 'r+') as file:
         playtime = json.load(file)  # Load leaderboard as a dictionary
 
 #
@@ -204,8 +202,10 @@ async def on_message(message):
     else:
         print(f'{message_author} said: {message_content}')
 
+openai_token = OpenAI(os.environ["OPENAI_TOKEN"])
+
 async def speak(text, voice):  # dict author is needed to find in dict the voice theyuse
-    client = OpenAI(api_key=keys["openai_api"])
+    client = OpenAI(openai_token)
     with client.audio.speech.with_streaming_response.create(
             model="tts-1",
             voice=voice,
@@ -214,7 +214,7 @@ async def speak(text, voice):  # dict author is needed to find in dict the voice
         response.stream_to_file(f"{text}:{voice}.mp3")
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
-    client = OpenAI(api_key=keys["openai_api"])
+    client = OpenAI(openai_token)
     with client.audio.speech.with_streaming_response.create(
         model="tts-1",
         voice=dict.get(message_author),
@@ -281,12 +281,12 @@ async def on_voice_state_update(member, before, after):
             playtime[user] += rounded_time_hour
             playtime[user] = round(playtime[user], 2)
             print(f"zaokrožil na {playtime[user]}")
-            with open("playtime.txt", "w") as file:
+            with open("/data/playtime.txt", "w+") as file:
                 json.dump(playtime, file)  # Dump leaderboard dictionary as JSON
             if user not in leaderboard or rounded_time_hour > leaderboard[user]:   #thanks to chat gbt i dont know what this works but it does
                 leaderboard[user] = rounded_time_hour
                 await channel.send(f"""New record from {member.mention}: {rounded_time_hour} minut. Your total muted time is {playtime[user]}""")
-                with open("leaderboard.txt", "w") as file:
+                with open("/data/leaderboard.txt", "w+") as file:
                     json.dump(leaderboard, file)  # Dump leaderboard dictionary as JSON
             print(f"{member.name} unmuted was muted for {rounded_time_hour}")
         else:
@@ -337,4 +337,4 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
-client.run(keys["discordapi_key"])
+client.run(os.environ["DISCORD_TOKEN"])
