@@ -32,7 +32,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: jozejan/jozetova-igracka
+        images: ${{ secrets.DOCKER_USERNAME }}/jozetova-igracka
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
