@@ -14,7 +14,7 @@ secrets:
   discord_token:
     file: ./discord_token.txt
   openai_token:
-    file: ./openai.txt
+    file: ./openai_token.txt
 
 volumes:
   jozetova-igracka-data:
