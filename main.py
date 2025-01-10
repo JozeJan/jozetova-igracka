@@ -9,12 +9,10 @@ from discord import FFmpegPCMAudio
 from openai import OpenAI
 import discord
 from discord.ext import commands
-
 from OrnkOkvara import NormalOkvara, OrnkOkvara
 global NormalOkvara, OrnkOkvara
 dict = {}
 import os
-
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 customlist = {}
 leaderboard = {}
@@ -27,7 +25,6 @@ lisenforjoin = {}
 messiges = {}
 timegable = 0
 randomgamblevalue = 0
-
 global emojiseznam
 emojiseznam = [
         "🥇 1st",
@@ -41,10 +38,7 @@ emojiseznam = [
         "💩 9th",
         "🗑️ 10th"
     ]
-
-
 intents = discord.Intents.all()
-
 
 # Create the bot instance with the specified command prefix and intents
 client = commands.Bot(command_prefix='!', intents=intents)
