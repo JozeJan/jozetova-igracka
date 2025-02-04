@@ -330,4 +330,4 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
-client.run(os.environ["DISCORD_TOKEN"])
+client.run(os.environ.get("DISCORD_TOKEN"))
