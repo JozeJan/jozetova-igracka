@@ -195,11 +195,12 @@ async def on_message(message):
     else:
         print(f'{message_author} said: {message_content}')
 
-openai_token = OpenAI(os.environ["OPENAI_TOKEN"])
+openai_client = OpenAI(
+    api_key=os.environ.get("OPENAI_API_KEY")
+)
 
 async def speak(text, voice):  # dict author is needed to find in dict the voice theyuse
-    client = OpenAI(openai_token)
-    with client.audio.speech.with_streaming_response.create(
+    with openai_client.audio.speech.with_streaming_response.create(
             model="tts-1",
             voice=voice,
             input=text,
@@ -207,8 +208,7 @@ async def speak(text, voice):  # dict author is needed to find in dict the voice
         response.stream_to_file(f"{text}:{voice}.mp3")
 
 async def tts(message_content, message_author): #dict author is needed to find in dict the voice theyuse
-    client = OpenAI(openai_token)
-    with client.audio.speech.with_streaming_response.create(
+    with openai_client.audio.speech.with_streaming_response.create(
         model="tts-1",
         voice=dict.get(message_author),
         input=message_content,
