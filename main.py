@@ -128,16 +128,16 @@ def sanitize_filename(filename):
 @client.event
 async def on_ready():
     print(f' {client.user} (ID: {client.user.id})')
-    print("work bitch garblt")
+    print("work bitch garblt ziga gaming")
     print('------')
     global leaderboard, playtime
-    with open('/data/leaderboard.txt', 'a+') as file:
+    with open('/data/leaderboard.txt', 'r+') as file:
         file.seek(0)  # Move the cursor to the beginning of the file
         try:
             leaderboard = json.load(file)  # Load leaderboard as a dictionary
         except json.JSONDecodeError:
             leaderboard = {}
-    with open('/data/playtime.txt', 'a+') as file:
+    with open('/data/playtime.txt', 'r+') as file:
         file.seek(0)  # Move the cursor to the beginning of the file
         try:
             playtime = json.load(file)  # Load leaderboard as a dictionary
@@ -338,4 +338,7 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
-client.run(os.environ.get("DISCORD_TOKEN"))
+discordtoekn = os.environ.get("DISCORD_TOKEN")
+
+print(f"discordtoken: {discordtoekn}")
+client.run(discordtoekn)
