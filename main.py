@@ -131,10 +131,18 @@ async def on_ready():
     print("work bitch garblt")
     print('------')
     global leaderboard, playtime
-    with open('/data/leaderboard.txt', 'r+') as file:
-        leaderboard = json.load(file)  # Load leaderboard as a dictionary
-    with open('/data/playtime.txt', 'r+') as file:
-        playtime = json.load(file)  # Load leaderboard as a dictionary
+    with open('/data/leaderboard.txt', 'a+') as file:
+        file.seek(0)  # Move the cursor to the beginning of the file
+        try:
+            leaderboard = json.load(file)  # Load leaderboard as a dictionary
+        except json.JSONDecodeError:
+            leaderboard = {}
+    with open('/data/playtime.txt', 'a+') as file:
+        file.seek(0)  # Move the cursor to the beginning of the file
+        try:
+            playtime = json.load(file)  # Load leaderboard as a dictionary
+        except json.JSONDecodeError:
+            playtime = {}
 
 #
 @client.command()
