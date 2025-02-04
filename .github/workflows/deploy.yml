@@ -2,8 +2,8 @@ name: Publish to Docker Hub
 
 on:
   push:
-    branches:
-      - master
+    branches: [ 'main', 'master' ]
+    tags: [ 'v*.*.*' ]
 
 jobs:
   build-and-push-image:
