@@ -7,7 +7,7 @@ WORKDIR /app
 VOLUME /data
 
 
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y ffmpeg
 
 # Copy the requirements file into the container
 COPY requirements.txt .
