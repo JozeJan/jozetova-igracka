@@ -354,6 +354,7 @@ async def leavenote(ctx, ime):
 
 @client.event
 async def on_member_update(before, after):
+    print("someting moved?")
     # specific_user_name = "joze3.0"  # Replace with the specific user's name
     if before.status != after.status:
         channel = client.get_channel(1235339151218577499)
