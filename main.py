@@ -151,6 +151,12 @@ async def on_ready():
 async def medic(ctx):
     await randommedic(ctx)
 
+@client.command()
+async def join(ctx):
+    voice_channel = ctx.author.voice.channel
+    await voice_channel.connect()
+    ctx.voice_client.play(FFmpegPCMAudio(f"{random.randint(1, 100)}.mp3"))
+
 
 @client.command()
 async def govori(ctx, pglas):
@@ -340,7 +346,26 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
+
+
+
+
 discordtoekn = os.environ.get("DISCORD_TOKEN")
 
-print(f"discordtoken: {discordtoekn}")
+
+
+
 client.run(discordtoekn)
+
+
+
+
+
+
+
+#simulate typing:
+# async with channel.typing():
+#     # simulate something heavy
+#     await asyncio.sleep(20)
+#
+# await channel.send('Done!')
