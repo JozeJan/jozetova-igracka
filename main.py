@@ -155,7 +155,7 @@ async def medic(ctx):
 async def join(ctx):
     voice_channel = ctx.author.voice.channel
     await voice_channel.connect()
-    ctx.voice_client.play(FFmpegPCMAudio(f"{random.randint(1, 100)}.mp3"))
+    ctx.voice_client.play(FFmpegPCMAudio(f"./intro songs/{random.randint(1, 100)}.mp3"))
 
 
 @client.command()
