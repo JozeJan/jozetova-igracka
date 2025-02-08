@@ -6,6 +6,7 @@ from asyncio import tasks
 import re
 
 from discord import FFmpegPCMAudio
+from dulwich.porcelain import status
 from openai import OpenAI
 import discord
 from discord.ext import commands
@@ -352,6 +353,12 @@ async def leavenote(ctx, ime):
         lisenforjoin[ime] = ""
 
 
+@client.event
+async def on_member_update(before, after):
+    # specific_user_name = "joze3.0"  # Replace with the specific user's name
+    if before.status != after.status:
+        channel = client.get_channel(1235339151218577499)
+        await channel.send(f"{after.name} has gone {after.status}")
 
 
 
