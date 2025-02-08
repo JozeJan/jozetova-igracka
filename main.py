@@ -130,6 +130,8 @@ async def on_ready():
     print(f' {client.user} (ID: {client.user.id})')
     print("work bitch garblt ziga gaming")
     print('------')
+    game = discord.Game("https://github.com/JozeJan/jozetova-igracka")
+    await client.change_presence(status=discord.Status.idle, activity=game)
     global leaderboard, playtime
     with open('/data/leaderboard.txt', 'r+') as file:
         file.seek(0)  # Move the cursor to the beginning of the file
