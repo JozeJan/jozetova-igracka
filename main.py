@@ -38,7 +38,7 @@ emojiseznam = [
         "💩 9th",
         "🗑️ 10th"
     ]
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
 # Create the bot instance with the specified command prefix and intents
 client = commands.Bot(command_prefix='!', intents=intents)
