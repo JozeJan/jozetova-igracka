@@ -6,7 +6,6 @@ from asyncio import tasks
 import re
 
 from discord import FFmpegPCMAudio
-from dulwich.porcelain import status
 from openai import OpenAI
 import discord
 from discord.ext import commands
