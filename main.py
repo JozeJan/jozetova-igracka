@@ -153,9 +153,15 @@ async def medic(ctx):
 
 @client.command()
 async def join(ctx):
-    voice_channel = ctx.author.voice.channel
-    await voice_channel.connect()
-    ctx.voice_client.play(FFmpegPCMAudio(f"./intro songs/{random.randint(1, 55)}.mp3"))
+    if ctx.author.voice is None:
+        return await ctx.send("You are not connected to a voice channel")
+    else:
+        voice_channel = ctx.author.voice.channel
+        if ctx.voice_client:
+            ctx.voice_client.play(FFmpegPCMAudio(f"./intro songs/{random.randint(1, 55)}.mp3"))
+        else:  # If the bot is not connected
+            await voice_channel.connect()  # Connect to the voice channel
+            ctx.voice_client.play(FFmpegPCMAudio(f"./intro songs/{random.randint(1, 55)}.mp3"))
 
 
 @client.command()
