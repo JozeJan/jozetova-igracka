@@ -38,9 +38,7 @@ emojiseznam = [
         "💩 9th",
         "🗑️ 10th"
     ]
-intents = Intents.default()
-intents.message_content = True
-intents.guild_members = True
+intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents)
 # Event listener for when the bot has finished preparing
 
@@ -350,13 +348,22 @@ async def leavenote(ctx, ime):
         lisennextmessig[ctx.author.name] = ime
         lisenforjoin[ime] = ""
 
-
 @client.event
-async def on_member_update(before, after):
-    # specific_user_name = "joze3.0"  # Replace with the specific user's name
-    if before.status != after.status:
-        channel = client.get_channel(1235339151218577499)
-        await channel.send(f"{after.name} has gone {after.status}")
+async def on_presence_update(before: discord.Member, after: discord.Member):
+    if after.id == 1168910452370178049:
+        print('{} changed status to {}'.format(
+            after.display_name,
+            after.status
+        ))
+
+
+
+# @client.event
+# async def on_member_update(before, after):
+#     # specific_user_name = "joze3.0"  # Replace with the specific user's name
+#     if before.status != after.status:
+#         channel = client.get_channel(1235339151218577499)
+#         await channel.send(f"{after.name} has gone {after.status}")
 
 
 
