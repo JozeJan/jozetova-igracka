@@ -40,8 +40,8 @@ emojiseznam = [
     ]
 intents = Intents.default()
 intents.message_content = True
+intents.guild_members = True
 client = commands.Bot(command_prefix='!', intents=intents)
-
 # Event listener for when the bot has finished preparing
 
 @client.event
