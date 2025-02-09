@@ -348,15 +348,13 @@ async def leavenote(ctx, ime):
         lisennextmessig[ctx.author.name] = ime
         lisenforjoin[ime] = ""
 
+
 @client.event
-async def on_presence_update(before: discord.Member, after: discord.Member):
-    if after.id == 1168910452370178049:
-        print('{} changed status to {}'.format(
-            after.display_name,
-            after.status
-        ))
-
-
+async def on_presence_update(before, after)
+    if before.member != after.member:
+        channel = client.get_channel(1235339151218577499)
+        await channel.send(f"{after.name} has gone {after.status}")
+        await channel.send(f"random info {after.member} and this {after.member.name}")
 
 # @client.event
 # async def on_member_update(before, after):
