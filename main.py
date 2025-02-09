@@ -350,7 +350,7 @@ async def leavenote(ctx, ime):
 
 
 @client.event
-async def on_presence_update(before, after)
+async def on_presence_update(before, after):
     if before.member != after.member:
         channel = client.get_channel(1235339151218577499)
         await channel.send(f"{after.name} has gone {after.status}")
