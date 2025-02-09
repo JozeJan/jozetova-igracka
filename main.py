@@ -4,7 +4,7 @@ import time
 import json
 from asyncio import tasks
 import re
-
+from discord import Intents
 from discord import FFmpegPCMAudio
 from openai import OpenAI
 import discord
@@ -38,9 +38,8 @@ emojiseznam = [
         "💩 9th",
         "🗑️ 10th"
     ]
-intents = discord.Intents.all()
-
-# Create the bot instance with the specified command prefix and intents
+intents = Intents.default()
+intents.message_content = True
 client = commands.Bot(command_prefix='!', intents=intents)
 
 # Event listener for when the bot has finished preparing
