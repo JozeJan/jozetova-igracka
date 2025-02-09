@@ -353,8 +353,8 @@ async def leavenote(ctx, ime):
 async def on_presence_update(before, after):
     if before.status != after.status:
         channel = client.get_channel(1235339151218577499)
-        await channel.send(f"{after.name} has gone {after.status}")
-        await channel.send(f"random info {after} and this {after.name}")
+        user_mention = f"<@{after.id}>"
+        await channel.send(f"{user_mention} has gone {after.status}", allowed_mentions=discord.AllowedMentions(users=False))
 
 # @client.event
 # async def on_member_update(before, after):
