@@ -13,7 +13,6 @@ from OrnkOkvara import NormalOkvara, OrnkOkvara
 global NormalOkvara, OrnkOkvara
 dict = {}
 import os
-import irot
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 customlist = {}
 leaderboard = {}
@@ -341,8 +340,9 @@ async def on_voice_state_update(member, before, after):
 
 @client.command()
 async def deepseek(ctx, *, message: str):
+    from irot import deepseekf
     """Stores the message after !deepseek"""
-    await ctx.send(f"recived an masssage : {message}")
+    print(f"recived an masssage for deepseek: {message}")
     await ctx.send(deepseekf(message))
 
 
