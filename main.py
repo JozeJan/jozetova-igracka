@@ -342,7 +342,7 @@ async def on_voice_state_update(member, before, after):
 @client.command()
 async def deepseek(ctx, *, message: str):
     """Stores the message after !deepseek"""
-    await ctx.send(deepseek(message))
+    await ctx.send(await deepseek(message))
 
 
 
