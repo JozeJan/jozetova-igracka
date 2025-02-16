@@ -13,6 +13,7 @@ from OrnkOkvara import NormalOkvara, OrnkOkvara
 global NormalOkvara, OrnkOkvara
 dict = {}
 import os
+import irot
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
 customlist = {}
 leaderboard = {}
@@ -338,6 +339,10 @@ async def on_voice_state_update(member, before, after):
         userincall[user] = after.channel.name
         print(f"{userincall} swiched")
 
+@client.command()
+async def deepseek(ctx, *, message: str):
+    """Stores the message after !deepseek"""
+    await ctx.send(deepseek(message))
 
 
 
@@ -355,6 +360,8 @@ async def on_presence_update(before, after):
         channel = client.get_channel(1235339151218577499)
         user_mention = f"<@{after.id}>"
         await channel.send(f"{user_mention} has gone {after.status}", allowed_mentions=discord.AllowedMentions(users=False))
+
+
 
 # @client.event
 # async def on_member_update(before, after):
