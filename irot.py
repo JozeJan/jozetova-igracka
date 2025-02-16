@@ -2,6 +2,7 @@
 
 
 import requests
+
 async def deepseekf(message_input):
     server_url = "http://192.168.20.215:11434/api/generate"
     payload = {
@@ -99,8 +100,11 @@ import aiohttp  # Use aiohttp for async requests
 async def deepseek_request(message_input):
     print(f"hold up let me cook {message_input}")
     server_url = "http://192.168.20.215:11434/api/generate"
-    payload = {"message": message_input}
+    payload = {"message": message_input,
+               "model": "deepseek-r1:14b"}
 
     async with aiohttp.ClientSession() as session:
         async with session.post(server_url, json=payload) as response:
             return await response.text()  # Await the response text
+
+await print(deepseek_request("test"))
