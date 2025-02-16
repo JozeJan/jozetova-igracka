@@ -4,7 +4,7 @@
 import requests
 
 
-async def deepseek(message_input):
+async def deepseekf(message_input):
     server_url = "http://192.168.20.215:11434/api/generate"
     payload = {
                 "model": "deepseek-r1:14b",
