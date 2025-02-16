@@ -3,7 +3,8 @@
 
 import requests
 
-async def deepseekf(message_input):
+
+async def deepseek_request(message_input):
     server_url = "http://192.168.20.215:11434/api/generate"
     payload = {
                 "model": "deepseek-r1:14b",
@@ -94,27 +95,5 @@ def irot(message_input, messages_before):
     return response.json()
 
 
-import aiohttp  # Use aiohttp for async requests
 
 
-import aiohttp
-import logging
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG)
-
-async def deepseek_request(message_input):
-    logging.debug(f"Starting deepseek_request with message: {message_input}")
-    server_url = "http://192.168.20.215:11434/api/generate"
-    payload = {"message": message_input, "model": "deepseek-r1:14b"}
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(server_url, json=payload) as response:
-                response_text = await response.text()
-                logging.debug(f"Response status: {response.status}")
-                logging.debug(f"Response text: {response_text}")
-                return response_text
-    except Exception as e:
-        logging.error(f"Error in deepseek_request: {e}")
-        return None
