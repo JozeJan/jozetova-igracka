@@ -106,5 +106,3 @@ async def deepseek_request(message_input):
     async with aiohttp.ClientSession() as session:
         async with session.post(server_url, json=payload) as response:
             return await response.text()  # Await the response text
-
-await print(deepseek_request("test"))
