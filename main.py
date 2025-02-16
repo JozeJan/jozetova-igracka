@@ -343,7 +343,8 @@ async def deepseek(ctx, *, message: str):
     from irot import deepseekf
     """Stores the message after !deepseek"""
     print(f"recived an masssage for deepseek: {message}")
-    await ctx.send(await deepseekf(message))
+    ai_response = await deepseekf(message)  # Await API call
+    await ctx.send(ai_response)  # Send extracted response
 
 
 
