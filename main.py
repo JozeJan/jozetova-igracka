@@ -340,9 +340,9 @@ async def on_voice_state_update(member, before, after):
 
 @client.command()
 async def deepseek(ctx, *, message: str):
-    from irot import deepseekf
-    print(f"recived an masssage for deepseek: {message}")
-    ai_response = await deepseekf(message)  # Await API call
+    from irot import deepseek_request
+    await ctx.send(f"recived an masssage for deepseek: {message}")
+    ai_response = await deepseek_request(message)  # Await API call
     await ctx.send(ai_response)  # Send extracted response
 
 
