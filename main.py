@@ -338,12 +338,16 @@ async def on_voice_state_update(member, before, after):
         userincall[user] = after.channel.name
         print(f"{userincall} swiched")
 
+
 @client.command()
 async def deepseek(ctx, *, message: str):
     from irot import deepseek_request
-    await ctx.send(f"recived an masssage for deepseek: {message}")
-    ai_response = await deepseek_request(message)  # Await API call
-    await ctx.send(ai_response)  # Send extracted response
+    await ctx.send(f"Received a message for deepseek: {message}")
+    try:
+        ai_response = await deepseek_request(message)  # Await API call
+        await ctx.send(f"AI Response: {ai_response}")  # Send formatted response
+    except Exception as e:
+        await ctx.send(f"An error occurred: {e}")
 
 
 
