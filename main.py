@@ -344,7 +344,7 @@ async def deepseek(ctx, *, message: str):
     from irot import deepseek_request
     await ctx.send(f"Received a message for deepseek: {message}")
     try:
-        ai_response = await deepseek_request(message)  # Await API call
+        ai_response = await deepseek_request("test")  # Await API call
         await ctx.send(f"AI Response: {ai_response}")  # Send formatted response
     except Exception as e:
         await ctx.send(f"An error occurred: {e}")
