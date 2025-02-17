@@ -1,8 +1,7 @@
 import aiohttp
 
-
 async def deepseek_request(message_input):
-    server_url = "http://192.168.20.215:11434/api/generate"
+    server_url = "http://localhost:11434/api/generate"
     payload = {
         "model": "deepseek-r1:14b",
         "prompt": f"""
@@ -78,3 +77,7 @@ async def deepseek_request(message_input):
         except aiohttp.ClientError as e:
             print(f"An error occurred: {e}")
             return None
+
+# Example usage:
+# result = await deepseek_request("YOUR_MESSAGE_HERE")
+# print(result)
