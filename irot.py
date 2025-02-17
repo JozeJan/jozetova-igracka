@@ -1,7 +1,7 @@
-import requests
+import aiohttp
 
 
-def deepseek_request(message_input):
+async def deepseek_request(message_input):
     server_url = "http://192.168.20.215:11434/api/generate"
     payload = {
         "model": "deepseek-r1:14b",
@@ -70,10 +70,11 @@ def deepseek_request(message_input):
         """,
         "stream": False
     }
-    try:
-        response = requests.post(server_url, json=payload)
-        response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
-        return None
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.post(server_url, json=payload) as response:
+                response.raise_for_status()
+                return await response.json()
+        except aiohttp.ClientError as e:
+            print(f"An error occurred: {e}")
+            return None
