@@ -51,7 +51,7 @@ async def on_command_error(ctx, error):
 async def errorsound(ctx):
     voice_channel = ctx.author.voice.channel
     if ctx.voice_client:
-        print("allready connected")
+        print("already connected")
     else:  # If the bot is not connected
         await voice_channel.connect()  # Connect to the voice channel
     if random.random() < 0.2:
