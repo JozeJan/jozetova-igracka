@@ -11,6 +11,7 @@ import discord
 from discord.ext import commands
 from OrnkOkvara import NormalOkvara, OrnkOkvara
 global NormalOkvara, OrnkOkvara
+
 dict = {}
 import os
 glasovi = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
@@ -143,7 +144,15 @@ async def on_ready():
         except json.JSONDecodeError:
             playtime = {}
 
-#
+
+
+@client.command()
+async def listaudio(ctx):
+    from audiofilesfeture import list_files
+    files = await list_files()
+    for file in files:
+        await ctx.send(file)
+
 @client.command()
 async def medic(ctx):
     await randommedic(ctx)
@@ -351,12 +360,6 @@ async def deepseek(ctx, *, message: str):
 
 
 
-@client.command()
-async def leavenote(ctx, ime):
-    if ime:
-        await ctx.send(f"Prepering a new message for {ime} the next message you send will be deliverd to him!")
-        lisennextmessig[ctx.author.name] = ime
-        lisenforjoin[ime] = ""
 
 
 @client.event
